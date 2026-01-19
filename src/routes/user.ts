@@ -1,6 +1,9 @@
 import { Router } from "express";
 import {prisma} from "../lib/db"
 import bcrypt from "bcrypt"
+import jwt from "jsonwebtoken"
+import { SinginInputTypes } from "../lib/types";
+import { SingupInputs } from "../lib/types";
 
 const router = Router();
 
@@ -12,13 +15,14 @@ router.get("/sa",(req,res)=>{
 // SignUP endPoint
 router.post("/signup",async (req,res)=>{
     try{
-
         const body = await req.body;
-        // console.log(body);
+        const Paresedbody = await SingupInputs.safeParse(body);
+
+        if(!Paresedbody.success){
+            res.status(401).json({msg:"Invalid Signup Inputs"})
+        }
         
-        // zod verification 
-        
-        
+        const {email,name}= body;
         const userExist = await prisma.user.findFirst({
             where:{
                 email:body.email,
@@ -34,17 +38,14 @@ router.post("/signup",async (req,res)=>{
         
         const newuser = await prisma.user.create({
             data:{
-                name:body.name,
-                email:body.email,
+                email,
+                name,
                 //@ts-ignore
                 password:hashPassword,
                 created_at: body.created_at,
-                // updated_at:body.updated_at
-            }
-            
+            }    
         }) 
-        console.log(newuser);
-        
+        // console.log(newuser);
         res.status(200).json({
             newuser,
             msg:"User Created SuccessFully.."})
@@ -54,31 +55,35 @@ router.post("/signup",async (req,res)=>{
                 msg:"Internal Server error"
             })
     }
-
-    
-
-
 })
 
 router.post("/signin",async (req,res)=>{
     const body = await req.body;
-    console.log(body);
+    const Paresedbody= await SinginInputTypes.safeParse(body);
+
+    if(!Paresedbody.success){
+        res.status(401).json({msg:"Invalid Signup Inputs"});
+        return;
+    }
+    console.log(Paresedbody);
 
     const user = await prisma.user.findFirst({
         where:{
-            email:body.email,
-            // name:body.name
+            email:Paresedbody.data.email,
         }
     })
+       
     //@ts-ignore
-    const decodedpass= await bcrypt.compare(body.password, user?.password);
-    if(!decodedpass){
-        return res.status(400).json({msg:"INvalid UserName or Password"});
+    const decodedpass=  bcrypt.compare(Paresedbody.data.email, user?.password);
+    if(!decodedpass || !user){
+        return res.status(400).json({msg:"Invalid UserName or Password"});
     }
 
 
+    const token = jwt.sign({userId:user.id}, process.env.JWT_SECRET!)
 
     res.json({
+        token,
         user,
         msg:"Login Successfull"
     })

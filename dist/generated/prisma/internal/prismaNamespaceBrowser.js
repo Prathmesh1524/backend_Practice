@@ -48,7 +48,7 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.QueryMode = exports.SortOrder = exports.UserScalarFieldEnum = exports.TransactionIsolationLevel = exports.ModelName = exports.AnyNull = exports.JsonNull = exports.DbNull = exports.NullTypes = exports.Decimal = void 0;
+exports.NullsOrder = exports.QueryMode = exports.SortOrder = exports.TransfersScalarFieldEnum = exports.UserScalarFieldEnum = exports.TransactionIsolationLevel = exports.ModelName = exports.AnyNull = exports.JsonNull = exports.DbNull = exports.NullTypes = exports.Decimal = void 0;
 const runtime = __importStar(require("@prisma/client/runtime/index-browser"));
 exports.Decimal = runtime.Decimal;
 exports.NullTypes = {
@@ -75,7 +75,8 @@ exports.JsonNull = runtime.JsonNull;
  */
 exports.AnyNull = runtime.AnyNull;
 exports.ModelName = {
-    user: 'user'
+    user: 'user',
+    Transfers: 'Transfers'
 };
 /*
  * Enums
@@ -91,6 +92,14 @@ exports.UserScalarFieldEnum = {
     name: 'name',
     email: 'email',
     password: 'password',
+    created_at: 'created_at',
+    Balance: 'Balance'
+};
+exports.TransfersScalarFieldEnum = {
+    id: 'id',
+    amount: 'amount',
+    note: 'note',
+    userid: 'userid',
     created_at: 'created_at'
 };
 exports.SortOrder = {
@@ -100,4 +109,8 @@ exports.SortOrder = {
 exports.QueryMode = {
     default: 'default',
     insensitive: 'insensitive'
+};
+exports.NullsOrder = {
+    first: 'first',
+    last: 'last'
 };
